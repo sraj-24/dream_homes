@@ -22,8 +22,11 @@
     "react-icons": "^4.10.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.22.9",
+    "@babel/eslint-parser": "^7.22.9",
     "@babel/preset-react": "^7.22.5",
-    "eslint": "^8.43.0",
+    "@next/eslint-plugin-next": "^13.4.9",
+    "eslint": "^8.44.0",
     "eslint-plugin-react": "^7.32.2"
   }
 }
