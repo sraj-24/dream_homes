@@ -1,115 +1,66 @@
-import Head from 'next/head';
-import styles from '../styles/Home.module.css';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Flex, Box, Text, Button } from '@chakra-ui/react';
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+import Property from '../components/Property';
+import { baseUrl, fetchApi } from '../utils/fetchApi';
 
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+const Banner = ({ purpose, title1, title2, desc1, desc2, buttonText, linkName, imageUrl }) => (
+  <Flex flexWrap='wrap' justifyContent='center' alignItems='center' m='10'>
+    <Image src={imageUrl} width={500} height={300} />
+    <Box p='5'>
+      <Text color='gray.500' fontSize='sm' fontWeight='medium'>{purpose}</Text>
+      <Text fontSize='3xl' fontWeight='bold'>{title1}<br />{title2}</Text>
+      <Text fontSize='lg' paddingTop='3' paddingBottom='3' color='gray.700'>{desc1}<br />{desc2}</Text>
+      <Button fontSize='xl' bg="blue.300" color="white">
+        <Link href={linkName}>{buttonText}</Link>
+      </Button>
+    </Box>
+  </Flex>
+);
 
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
+const Home = ({ propertiesForSale, propertiesForRent }) => (
+  <Box>
+    <Banner
+      purpose='RENT A HOME'
+      title1='Rental Homes for'
+      title2='Everyone'
+      desc1=' Explore from Apartments, builder floors, villas'
+      desc2='and more'
+      buttonText='Explore Renting'
+      linkName='/search?purpose=for-rent'
+      imageUrl='https://bayut-production.s3.eu-central-1.amazonaws.com/image/145426814/33973352624c48628e41f2ec460faba4'
+    />
+    <Flex flexWrap='wrap'>
+      {propertiesForRent.map((property) => <Property property={property} key={property.id} />)}
+    </Flex>
+    <Banner
+      purpose='BUY A HOME'
+      title1=' Find, Buy & Own Your'
+      title2='Dream Home'
+      desc1=' Explore from Apartments, land, builder floors,'
+      desc2=' villas and more'
+      buttonText='Explore Buying'
+      linkName='/search?purpose=for-sale'
+      imageUrl='https://bayut-production.s3.eu-central-1.amazonaws.com/image/110993385/6a070e8e1bae4f7d8c1429bc303d2008'
+    />
+    <Flex flexWrap='wrap'>
+      {propertiesForSale.map((property) => <Property property={property} key={property.id} />)}
+    </Flex>
+  </Box>
+);
 
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
+export async function getStaticProps() {
+  const propertyForSale = await fetchApi(`${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-sale&hitsPerPage=6`);
+  const propertyForRent = await fetchApi(`${baseUrl}/properties/list?locationExternalIDs=5002&purpose=for-rent&hitsPerPage=6`);
 
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel" className={styles.logo} />
-        </a>
-      </footer>
-
-      <style jsx>{`
-        main {
-          padding: 5rem 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-        }
-        footer {
-          width: 100%;
-          height: 100px;
-          border-top: 1px solid #eaeaea;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        footer img {
-          margin-left: 0.5rem;
-        }
-        footer a {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-decoration: none;
-          color: inherit;
-        }
-        code {
-          background: #fafafa;
-          border-radius: 5px;
-          padding: 0.75rem;
-          font-size: 1.1rem;
-          font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-            DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
-        }
-      `}</style>
-
-      <style jsx global>{`
-        html,
-        body {
-          padding: 0;
-          margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-            Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-            sans-serif;
-        }
-        * {
-          box-sizing: border-box;
-        }
-      `}</style>
-    </div>
-  )
+  return {
+    props: {
+      propertiesForSale: propertyForSale?.hits,
+      propertiesForRent: propertyForRent?.hits,
+    },
+  };
 }
+
+export default Home;
